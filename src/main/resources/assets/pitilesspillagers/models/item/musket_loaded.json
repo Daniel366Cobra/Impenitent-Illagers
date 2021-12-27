@@ -1,0 +1,76 @@
+{
+  "parent": "pitilesspillagers:item/musket",
+  "textures": {
+    "layer0": "pitilesspillagers:item/musket_loaded"
+  },
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [
+        -40,
+        90,
+        0
+      ],
+      "translation": [
+        -2,
+        0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [
+        -40,
+        -90,
+        0
+      ],
+      "translation": [
+        -2,
+        0,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        -40,
+        90,
+        0
+      ],
+      "translation": [
+        -2,
+        5,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        -40,
+        -90,
+        0
+      ],
+      "translation": [
+        -2,
+        5,
+        0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.daniel366cobra.pitilesspillagers.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "RaidAddRaiderMixin"
+  ],
+  "client": [
+
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
