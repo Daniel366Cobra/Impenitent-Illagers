@@ -1,5 +1,6 @@
-package com.daniel366cobra.pitilesspillagers.entity;
+package com.daniel366cobra.pitilesspillagers.entity.mob;
 
+import com.daniel366cobra.pitilesspillagers.ModItems;
 import com.daniel366cobra.pitilesspillagers.PitilessPillagers;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -55,8 +56,8 @@ public class ElitePillagerEntity extends PillagerEntity {
         if (distToCurrentTarget != -1.0f) {
 
             if (distToCurrentTarget <= 4.0f) {
-                if (!this.isHolding(PitilessPillagers.IRON_KNIFE))
-                this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(PitilessPillagers.IRON_KNIFE));
+                if (!this.isHolding(ModItems.IRON_KNIFE))
+                this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(ModItems.IRON_KNIFE));
 
                 if (this.isCharging()) this.setCharging(false);
         } else {

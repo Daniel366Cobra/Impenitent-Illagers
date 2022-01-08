@@ -1,4 +1,4 @@
-package com.daniel366cobra.pitilesspillagers.entity;
+package com.daniel366cobra.pitilesspillagers.entity.mob;
 
 import net.minecraft.block.AbstractFireBlock;
 import net.minecraft.block.Block;
@@ -86,7 +86,7 @@ public class ArsonistPillagerEntity extends IllagerEntity
 
     @Override
     public SoundEvent getCelebratingSound() {
-        return null;
+        return SoundEvents.ENTITY_PILLAGER_CELEBRATE;
     }
 
     @Override

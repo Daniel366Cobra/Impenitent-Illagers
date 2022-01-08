@@ -35,6 +35,7 @@ public abstract class BaseProjectileEntity extends Entity {
     @Nullable
     private Entity owner;
     private boolean shot;
+    private boolean leftOwner;
 
 
     BaseProjectileEntity(EntityType<? extends BaseProjectileEntity> entityType, World world) {
@@ -107,7 +108,22 @@ public abstract class BaseProjectileEntity extends Entity {
             this.shot = true;
         }
 
+        if (!this.leftOwner) {
+            this.leftOwner = this.shouldLeaveOwner();
+        }
+
         super.tick();
+    }
+
+    private boolean shouldLeaveOwner() {
+        Entity ownerEntity = this.getOwner();
+        if (ownerEntity != null) {
+            for (Entity iterEntity : this.world.getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0), entity -> !entity.isSpectator() && entity.collides())) {
+                if (iterEntity.getRootVehicle() != ownerEntity.getRootVehicle()) continue;
+                return false;
+            }
+        }
+        return true;
     }
 
 
@@ -132,8 +148,8 @@ public abstract class BaseProjectileEntity extends Entity {
         Vec3d vec3d = new Vec3d(x, y, z).normalize().add(this.random.nextGaussian() * (double)0.0075f * (double)divergence, this.random.nextGaussian() * (double)0.0075f * (double)divergence, this.random.nextGaussian() * (double)0.0075f * (double)divergence).multiply(speed);
         this.setVelocity(vec3d);
         double d = vec3d.horizontalLength();
-        this.setYaw((float)(MathHelper.atan2(vec3d.x, vec3d.z) * 57.2957763671875));
-        this.setPitch((float)(MathHelper.atan2(vec3d.y, d) * 57.2957763671875));
+        this.setYaw((float)(MathHelper.atan2(vec3d.x, vec3d.z) * 180.0D / Math.PI));
+        this.setPitch((float)(MathHelper.atan2(vec3d.y, d) * 180.0D / Math.PI));
         this.prevYaw = this.getYaw();
         this.prevPitch = this.getPitch();
     }
@@ -187,7 +203,11 @@ public abstract class BaseProjectileEntity extends Entity {
     }
 
     protected boolean canHit(Entity entity) {
-        return !entity.isSpectator() && entity.isAlive() && entity.collides() && entity != this.getOwner() && !entity.isConnectedThroughVehicle(this.getOwner());
+        if (entity.isSpectator() || !entity.isAlive() || !entity.collides()) {
+            return false;
+        }
+        Entity entity2 = this.getOwner();
+        return entity2 == null || this.leftOwner || !entity2.isConnectedThroughVehicle(entity);
     }
 
     protected void updateRotation() {

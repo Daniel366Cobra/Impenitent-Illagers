@@ -1,10 +1,9 @@
 package com.daniel366cobra.pitilesspillagers.client;
 
+import com.daniel366cobra.pitilesspillagers.ModEntities;
+import com.daniel366cobra.pitilesspillagers.ModItems;
 import com.daniel366cobra.pitilesspillagers.PitilessPillagers;
-import com.daniel366cobra.pitilesspillagers.client.render.entity.ArsonistPillagerEntityRenderer;
-import com.daniel366cobra.pitilesspillagers.client.render.entity.ElitePillagerEntityRenderer;
-import com.daniel366cobra.pitilesspillagers.client.render.entity.KidnapperPillagerEntityRenderer;
-import com.daniel366cobra.pitilesspillagers.client.render.entity.MusketProjectileEntityRenderer;
+import com.daniel366cobra.pitilesspillagers.client.render.entity.*;
 import com.daniel366cobra.pitilesspillagers.item.MusketItem;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
@@ -36,37 +35,42 @@ public class PitilessPillagersClient implements ClientModInitializer {
     public static final EntityModelLayer MODEL_ELITE_PILLAGER_LAYER = new EntityModelLayer(new Identifier("pitilesspillagers", "elite_pillager"), "main");
     public static final EntityModelLayer MODEL_ARSONIST_PILLAGER_LAYER = new EntityModelLayer(new Identifier("pitilesspillagers", "arsonist_pillager"), "main");
     public static final EntityModelLayer MODEL_KIDNAPPER_PILLAGER_LAYER = new EntityModelLayer(new Identifier("pitilesspillagers", "kidnapper_pillager"), "main");
+    public static final EntityModelLayer MODEL_INTERLOPER_PILLAGER_LAYER = new EntityModelLayer(new Identifier("pitilesspillagers", "interloper_pillager"), "main");
 
     @Override
     public void onInitializeClient() {
         /*
          * Registers our Entity renderers, which provides a model and texture for the entity.
          */
-        EntityRendererRegistry.register(PitilessPillagers.ELITE_PILLAGER, ElitePillagerEntityRenderer::new);
-        EntityRendererRegistry.register(PitilessPillagers.ARSONIST_PILLAGER, ArsonistPillagerEntityRenderer::new);
-        EntityRendererRegistry.register(PitilessPillagers.KIDNAPPER_PILLAGER, KidnapperPillagerEntityRenderer::new);
-        EntityRendererRegistry.register(PitilessPillagers.MUSKET_PROJECTILE, MusketProjectileEntityRenderer::new);
+        EntityRendererRegistry.register(ModEntities.ELITE_PILLAGER, ElitePillagerEntityRenderer::new);
+        EntityRendererRegistry.register(ModEntities.ARSONIST_PILLAGER, ArsonistPillagerEntityRenderer::new);
+        EntityRendererRegistry.register(ModEntities.KIDNAPPER_PILLAGER, KidnapperPillagerEntityRenderer::new);
+        EntityRendererRegistry.register(ModEntities.INTERLOPER_PILLAGER, InterloperPillagerEntityRenderer::new);
+
+        EntityRendererRegistry.register(ModEntities.MUSKET_PROJECTILE, MusketProjectileEntityRenderer::new);
+
 
         EntityModelLayerRegistry.registerModelLayer(MODEL_ELITE_PILLAGER_LAYER, IllagerEntityModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(MODEL_ARSONIST_PILLAGER_LAYER, IllagerEntityModel::getTexturedModelData);
         EntityModelLayerRegistry.registerModelLayer(MODEL_KIDNAPPER_PILLAGER_LAYER, IllagerEntityModel::getTexturedModelData);
+        EntityModelLayerRegistry.registerModelLayer(MODEL_INTERLOPER_PILLAGER_LAYER, IllagerEntityModel::getTexturedModelData);
 
 
-        FabricModelPredicateProviderRegistry.register(PitilessPillagers.MUSKET, new Identifier("load_progress"), (itemStack, clientWorld, livingEntity, intValue) -> {
+        FabricModelPredicateProviderRegistry.register(ModItems.MUSKET, new Identifier("load_progress"), (itemStack, clientWorld, livingEntity, intValue) -> {
             if (livingEntity == null) {
                 return 0.0F;
             }
             return livingEntity.getActiveItem() != itemStack ? 0.0F : (itemStack.getMaxUseTime() - livingEntity.getItemUseTimeLeft()) / 20.0F;
         });
 
-        FabricModelPredicateProviderRegistry.register(PitilessPillagers.MUSKET, new Identifier("loading"),(itemStack, clientWorld, livingEntity, intValue) -> {
+        FabricModelPredicateProviderRegistry.register(ModItems.MUSKET, new Identifier("loading"),(itemStack, clientWorld, livingEntity, intValue) -> {
             if (livingEntity == null) {
                 return 0.0F;
             }
             return livingEntity.getActiveItem() != itemStack ? 0.0F : 1.0F;
         });
 
-        FabricModelPredicateProviderRegistry.register(PitilessPillagers.MUSKET, new Identifier("loaded"), (itemStack, clientWorld, livingEntity, intValue) -> MusketItem.isLoaded(itemStack) ? 1.0F : 0.0F);
+        FabricModelPredicateProviderRegistry.register(ModItems.MUSKET, new Identifier("loaded"), (itemStack, clientWorld, livingEntity, intValue) -> MusketItem.isLoaded(itemStack) ? 1.0F : 0.0F);
 
 
         HudRenderCallback.EVENT.register((matrixStack, tickDelta) -> {
@@ -99,8 +103,6 @@ public class PitilessPillagersClient implements ClientModInitializer {
                     }
 
                 }
-
-
         });
 
     }

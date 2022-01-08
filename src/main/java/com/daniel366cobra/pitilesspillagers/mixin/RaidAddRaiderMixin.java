@@ -1,5 +1,6 @@
 package com.daniel366cobra.pitilesspillagers.mixin;
 
+import com.daniel366cobra.pitilesspillagers.ModEntities;
 import com.daniel366cobra.pitilesspillagers.PitilessPillagers;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.mob.PillagerEntity;
@@ -30,13 +31,13 @@ public abstract class RaidAddRaiderMixin {
 		boolean shouldReplace = raider.getRandom().nextBoolean();
 
 		if (raider instanceof PillagerEntity) {
-							raiderCompanion = PitilessPillagers.ELITE_PILLAGER.create(world);
+							raiderCompanion = ModEntities.ELITE_PILLAGER.create(world);
 		}
 		if (raider instanceof WitchEntity) {
-				raiderCompanion = PitilessPillagers.ARSONIST_PILLAGER.create(world);
+				raiderCompanion = ModEntities.ARSONIST_PILLAGER.create(world);
 		}
 		if (raider instanceof VindicatorEntity) {
-				raiderCompanion = PitilessPillagers.KIDNAPPER_PILLAGER.create(world);
+				raiderCompanion = ModEntities.KIDNAPPER_PILLAGER.create(world);
 		}
 		if (shouldReplace) {
 			raider = raiderCompanion;

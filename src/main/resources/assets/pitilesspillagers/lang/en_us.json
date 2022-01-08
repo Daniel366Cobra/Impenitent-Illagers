@@ -6,10 +6,12 @@
   "item.pitilesspillagers.elite_pillager_spawn_egg": "Elite Pillager Spawn Egg",
   "item.pitilesspillagers.arsonist_pillager_spawn_egg": "Arsonist Spawn Egg",
   "item.pitilesspillagers.kidnapper_pillager_spawn_egg": "Kidnapper Spawn Egg",
+  "item.pitilesspillagers.interloper_pillager_spawn_egg": "Interloper Spawn Egg",
 
   "entity.pitilesspillagers.elite_pillager": "Elite Pillager",
   "entity.pitilesspillagers.arsonist_pillager": "Arsonist",
   "entity.pitilesspillagers.kidnapper_pillager": "Kidnapper",
+  "entity.pitilesspillagers.interloper_pillager": "Interloper",
 
   "sound.bullet.hit": "Bullet hits",
   "sound.bullet.ricochet": "Bullet ricochets",
@@ -17,6 +19,7 @@
   "sound.musket.misfire": "Musket misfires",
   "sound.musket.cock_start": "Musket cocking",
   "sound.musket.cock_half": "Musket half-cocked",
+  "sound.musket.powder_pour": "Powder pouring",
   "sound.musket.cock_full": "Musket cocked and loaded",
 
   "death.attack.bullet": "%1$s was sniped by %2$s.",

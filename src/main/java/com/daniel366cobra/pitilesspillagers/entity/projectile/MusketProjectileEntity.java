@@ -1,7 +1,7 @@
 package com.daniel366cobra.pitilesspillagers.entity.projectile;
 
+import com.daniel366cobra.pitilesspillagers.ModEntities;
 import com.daniel366cobra.pitilesspillagers.ModSounds;
-import com.daniel366cobra.pitilesspillagers.PitilessPillagers;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Material;
 import net.minecraft.entity.*;
@@ -16,8 +16,6 @@ import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.network.packet.s2c.play.GameStateChangeS2CPacket;
-import net.minecraft.particle.BlockStateParticleEffect;
-import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -27,9 +25,11 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
@@ -44,11 +44,12 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
 
     private static final Map<Material, Float> materialDragMultipliers = fillMaterialDragValues();
 
-    private static final HashSet<Material> passthroughMaterials = fillPassthroughMaterials();
+    private static final HashSet<Material> passthroughMaterials = fillPenetrableMaterials();
 
     private static final HashSet<Material> breakableMaterials = fillBreakableMaterials();
 
     private static final TrackedData<Byte> RICOCHET_TIMER = DataTracker.registerData(MusketProjectileEntity.class, TrackedDataHandlerRegistry.BYTE);
+    private static final TrackedData<Integer> LIFE = DataTracker.registerData(MusketProjectileEntity.class, TrackedDataHandlerRegistry.INTEGER);
 
     private boolean noRicochet = false;
 
@@ -58,7 +59,6 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
 
     protected int inGroundTime;
 
-    private int life;
     private double damage = 2.0;
 
     private SoundEvent sound = this.getHitSound();
@@ -69,7 +69,7 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
     }
 
     public MusketProjectileEntity(World world) {
-        super(PitilessPillagers.MUSKET_PROJECTILE, world);
+        super(ModEntities.MUSKET_PROJECTILE, world);
         this.setRicochetTimer((byte)0);
     }
 
@@ -81,7 +81,7 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
 
     public MusketProjectileEntity(World world, LivingEntity shooter, double damage, boolean noRicochet)
     {
-        this(world, shooter.getX(), shooter.getY() + shooter.getEyeHeight(shooter.getPose()) - 0.1D, shooter.getZ());
+        this(world, shooter.getX(), shooter.getY() + shooter.getEyeHeight(shooter.getPose()) - 0.3D, shooter.getZ());
         this.setOwner(shooter);
         this.setDamage(damage);
         this.setNoRicochet(noRicochet);
@@ -130,21 +130,20 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
         return breakableMaterialsSet;
     }
 
-    private static HashSet<Material> fillPassthroughMaterials()
+    private static HashSet<Material> fillPenetrableMaterials()
     {
+        HashSet<Material> penetrableMaterialsSet = new HashSet<Material>(fillBreakableMaterials());
 
-        HashSet<Material> passthroughMaterialsSet = new HashSet<Material>(fillBreakableMaterials());
+        penetrableMaterialsSet.add(Material.BAMBOO);
+        penetrableMaterialsSet.add(Material.CACTUS);
+        penetrableMaterialsSet.add(Material.CARPET);
+        penetrableMaterialsSet.add(Material.LEAVES);
+        penetrableMaterialsSet.add(Material.SNOW_LAYER);
+        penetrableMaterialsSet.add(Material.SNOW_BLOCK);
+        penetrableMaterialsSet.add(Material.SPONGE);
+        penetrableMaterialsSet.add(Material.WOOL);
 
-        passthroughMaterialsSet.add(Material.BAMBOO);
-        passthroughMaterialsSet.add(Material.CACTUS);
-        passthroughMaterialsSet.add(Material.CARPET);
-        passthroughMaterialsSet.add(Material.LEAVES);
-        passthroughMaterialsSet.add(Material.SNOW_LAYER);
-        passthroughMaterialsSet.add(Material.SNOW_BLOCK);
-        passthroughMaterialsSet.add(Material.SPONGE);
-        passthroughMaterialsSet.add(Material.WOOL);
-
-        return passthroughMaterialsSet;
+        return penetrableMaterialsSet;
     }
 
     @Override
@@ -159,12 +158,12 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
     @Override
     public void setVelocity(double x, double y, double z, float speed, float divergence) {
         super.setVelocity(x, y, z, speed, divergence);
-        this.life = 0;
+        this.setLife(0);
     }
 
     public void setVelocity(Entity shooter, float pitch, float yaw, float speed, float divergence) {
         super.setVelocity(shooter, pitch, yaw, 0.0f, speed, divergence);
-        this.life = 0;
+        this.setLife(0);
     }
 
 
@@ -178,7 +177,7 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
     @Override
     public void setVelocityClient(double x, double y, double z) {
         super.setVelocityClient(x, y, z);
-        this.life = 0;
+        this.setLife(0);
     }
 
     @Override
@@ -192,7 +191,6 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
 
         this.age();
 
-
         Vec3d currentVelocityVec3d = this.getVelocity();
 
         if (this.prevPitch == 0.0f && this.prevYaw == 0.0f) {
@@ -202,9 +200,6 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
             this.prevYaw = this.getYaw();
             this.prevPitch = this.getPitch();
         }
-
-
-
 
         if (this.inGround) {
             this.setVelocity(Vec3d.ZERO);
@@ -249,7 +244,7 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
 
             currentVelocityVec3d = this.getVelocity();
 
-            this.spawnParticles(4);
+            this.spawnParticles();
 
             double horizontalVelocityLength = currentVelocityVec3d.horizontalLength();
 
@@ -281,11 +276,33 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
         }
     }
 
+    private void spawnParticles() {
+        int life = this.getLife();
+
+        if (life < 2) {
+            for (int i = 0; i < 25; i++)
+            {
+                float velMagnModifier = 0.5F + random.nextFloat(0.5f, 1f);
+
+                float particleVelX = (float)this.getVelocity().normalize().getX() * velMagnModifier + (-0.15F + random.nextFloat() * 0.3F);
+                float particleVelY = (float)this.getVelocity().normalize().getY() * velMagnModifier + (-0.15F + random.nextFloat() * 0.3F);
+                float particleVelZ = (float)this.getVelocity().normalize().getZ() * velMagnModifier + (-0.15F + random.nextFloat() * 0.3F);
 
 
+                this.world.addParticle(ParticleTypes.CLOUD, true, this.getParticleX(0.5), this.getBodyY(0.5), this.getParticleZ(0.5), particleVelX, particleVelY, particleVelZ);
+
+            }
+        } else
+        {
+            this.world.addParticle(ParticleTypes.END_ROD, true, this.getParticleX(0.5), this.getBodyY(0.5), this.getParticleZ(0.5), this.random.nextFloat(-0.1f, 0.1f), this.random.nextFloat(-0.1f, 0.1f), this.random.nextFloat(-0.1f, 0.1f));
+            this.world.addParticle(ParticleTypes.END_ROD, true, this.getParticleX(0.5) - this.getVelocity().getX() / 2, this.getBodyY(0.5) - this.getVelocity().getY() / 2, this.getParticleZ(0.5) - this.getVelocity().getZ() / 2, this.random.nextFloat(-0.1f, 0.1f), this.random.nextFloat(-0.1f, 0.1f), this.random.nextFloat(-0.1f, 0.1f));
+
+        }
+    }
     protected void age() {
-               ++this.life;
-        if (this.life >= 200 || this.inGroundTime >= 10) {
+        int life = this.getLife();
+        this.setLife(life + 1);
+        if (life >= 200 || this.inGroundTime >= 5) {
             this.discard();
         }
     }
@@ -302,7 +319,6 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
             this.emitGameEvent(GameEvent.PROJECTILE_LAND, this.getOwner());
         }
     }
-
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
@@ -331,7 +347,6 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
         if (hitPassthroughMaterial && currentVelocityLength > 1.0D) {
             //Slow down in passthrough blocks
             this.inGround = false;
-            LOGGER.info("Hit passthrough block");
 
             float dragMultiplier = materialDragMultipliers.get(hitMaterial);
 
@@ -339,21 +354,20 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
             currentVelocityY *= dragMultiplier;
             currentVelocityZ *= dragMultiplier;
 
-            this.setVelocity(new Vec3d(currentVelocityX, currentVelocityY, currentVelocityZ));
-
             //Destroy passthrough breakable blocks
             if (hitBreakableMaterial && !world.isClient())
             {
-                LOGGER.info("Hit breakable block");
+
                 world.breakBlock(hitBlockPos, false, this);
             }
+            this.setVelocity(new Vec3d(currentVelocityX, currentVelocityY, currentVelocityZ));
+            return;
         }
         else
         {
-            if (!this.isNoRicochet())
-            {
+            if (!this.isNoRicochet() && currentVelocityLength >= 3.0f) {
                 //Ricochet detection
-                double hitAngle = 0.0D;
+                double hitAngle;
                 double vecHitInPlane = 0.0D;
                 double vecHitNormal = 0.0D;
                 float multX = 1.0F;
@@ -364,24 +378,19 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
                 boolean hitAlongZ = (blockHitResult.getSide() == Direction.NORTH || blockHitResult.getSide() == Direction.SOUTH);
                 boolean hitAlongY = (blockHitResult.getSide() == Direction.DOWN || blockHitResult.getSide() == Direction.UP);
 
-                if(hitAlongX)
-                {
+                if (hitAlongX) {
                     vecHitInPlane = Math.sqrt(currentVelocityY * currentVelocityY + currentVelocityZ * currentVelocityZ);
                     vecHitNormal = currentVelocityX;
                     multX = -0.5F;
                     multY = 0.5F;
                     multZ = 0.5F;
-                }
-                else if (hitAlongZ)
-                {
+                } else if (hitAlongZ) {
                     vecHitInPlane = Math.sqrt(currentVelocityX * currentVelocityX + currentVelocityY * currentVelocityY);
                     vecHitNormal = currentVelocityZ;
                     multX = 0.5F;
                     multY = 0.5F;
                     multZ = -0.5F;
-                }
-                else if (hitAlongY)
-                {
+                } else if (hitAlongY) {
                     vecHitInPlane = Math.sqrt(currentVelocityX * currentVelocityX + currentVelocityZ * currentVelocityZ);
                     vecHitNormal = currentVelocityY;
                     multX = 0.5F;
@@ -391,43 +400,28 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
                 //Compute angle from cathets
                 hitAngle = Math.abs(Math.atan2(vecHitNormal, vecHitInPlane) * 180.0D / Math.PI);
 
-                if (hitAngle <= 30.0D && currentVelocityLength > 3.0F) //Ricochet
+                if (hitAngle <= 30.0D) //Ricochet
                 {
-                    LOGGER.info("Hit solid block, ricocheting");
 
-                    if (!world.isClient())
-                    {
-                        this.setRicochetTimer((byte) 10);
+                    if (!world.isClient()) {
+                        this.setRicochetTimer((byte) 5);
                     }
                     world.playSound(null, this.getX(), this.getY(), this.getZ(), ModSounds.BULLET_RICOCHET, SoundCategory.PLAYERS, 1.0F, 1.0F);
                     currentVelocityX *= multX;
                     currentVelocityY *= multY;
                     currentVelocityZ *= multZ;
-
-
+                    this.setVelocity(new Vec3d(currentVelocityX, currentVelocityY, currentVelocityZ));
+                    return;
                 }
             }
-            else //embed in block
-            {
-                if (this.getRicochetTimer() <= 0 || currentVelocityLength <= 3.0F)
-                {
-                    LOGGER.info("Hit solid block, embedding");
+        } //If nothing of the above happened, embed in block and break out of routine until next tick
 
-                    world.playSound(null, this.getX(), this.getY(), this.getZ(), ModSounds.BULLET_HIT, SoundCategory.PLAYERS, 1.0F, 1.0F);
-                    this.inGround = true;
-
-                    for (int k = 0; k <= 5; k++)
-                    {
-                        world.addParticle(new BlockStateParticleEffect(ParticleTypes.BLOCK, hitBlockState),
-                                this.getX(), this.getY(), this.getZ(),
-                                -currentVelocityX * 0.1F + this.random.nextFloat(),
-                                -currentVelocityY * 0.1F + this.random.nextFloat(),
-                                -currentVelocityZ * 0.1F + this.random.nextFloat());
-                    }
-                }
-            }
+        if (this.getRicochetTimer() <= 0) {
+            world.playSound(null, this.getX(), this.getY(), this.getZ(), ModSounds.BULLET_HIT, SoundCategory.PLAYERS, 1.0F, 1.0F);
+            this.inGround = true;
         }
-        this.setVelocity(new Vec3d(currentVelocityX, currentVelocityY, currentVelocityZ));
+
+
     }
 
 
@@ -450,11 +444,10 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
 
         double totalDamage = this.getDamage() * this.getVelocity().length();
 
-        //Headshot and close-range hit detection
-
+        //Upper body hit detection
         if (this.getY() + this.getHeight() * 0.5F >= (hitEntity.getY() + hitEntity.getHeight() * 0.75F))
         {
-            totalDamage *= 2.0D;
+            totalDamage *= 1.5D;
             world.playSound(this.getX(), this.getY(),this.getZ(),SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1,2, false);
         }
 
@@ -475,6 +468,16 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
             this.playSound(this.sound, 1.0f, 1.2f / (this.random.nextFloat() * 0.2f + 0.9f));
         }
         this.discard();
+    }
+
+    private int getLife()
+    {
+        return this.getDataTracker().get(LIFE);
+    }
+
+    private void setLife(int life)
+    {
+        this.getDataTracker().set(LIFE, life);
     }
 
     private byte getRicochetTimer()
@@ -516,7 +519,7 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        nbt.putShort("life", (short) this.life);
+        nbt.putShort("life", (short) this.getLife());
         if (this.inBlockState != null) {
             nbt.put("inBlockState", NbtHelper.fromBlockState(this.inBlockState));
         }
@@ -530,7 +533,7 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        this.life = nbt.getShort("life");
+        this.setLife(nbt.getShort("life"));
         if (nbt.contains("inBlockState", 10)) {
             this.inBlockState = NbtHelper.toBlockState(nbt.getCompound("inBlockState"));
         }
@@ -589,16 +592,8 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
     @Override
     protected void initDataTracker() {
         this.dataTracker.startTracking(RICOCHET_TIMER, (byte) 0);
-
+        this.dataTracker.startTracking(LIFE, 0);
     }
 
-    private void spawnParticles(int amount) {
-
-        ParticleEffect trailingParticleEffect = ParticleTypes.END_ROD;
-
-        for (int j = 0; j < amount; ++j) {
-            this.world.addParticle(trailingParticleEffect, true, this.getParticleX(0.5), this.getRandomBodyY(), this.getParticleZ(0.5), 0.0, 0.02, 0.0);
-        }
-    }
 
 }

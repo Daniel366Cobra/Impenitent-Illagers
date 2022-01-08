@@ -1,6 +1,6 @@
 package com.daniel366cobra.pitilesspillagers.client.render.entity;
 
-import com.daniel366cobra.pitilesspillagers.entity.ArsonistPillagerEntity;
+import com.daniel366cobra.pitilesspillagers.entity.mob.ArsonistPillagerEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.render.entity.EntityRendererFactory;

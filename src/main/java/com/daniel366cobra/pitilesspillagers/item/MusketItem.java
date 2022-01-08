@@ -1,43 +1,59 @@
 package com.daniel366cobra.pitilesspillagers.item;
 
+import com.daniel366cobra.pitilesspillagers.ModItems;
 import com.daniel366cobra.pitilesspillagers.ModSounds;
-import com.daniel366cobra.pitilesspillagers.PitilessPillagers;
+import com.daniel366cobra.pitilesspillagers.entity.MusketUser;
 import com.daniel366cobra.pitilesspillagers.entity.projectile.MusketProjectileEntity;
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.EntityDamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.RangedWeaponItem;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Predicate;
 
-public class MusketItem extends Item{
+public class MusketItem extends RangedWeaponItem{
     private static final String LOADED_KEY = "Loaded";
 
 
-    private boolean cocked = false;
-    private boolean loaded = false;
+    public static final Predicate<ItemStack> MUSKET_PROJECTILES = stack -> stack.isOf(ModItems.MUSKET_BALL);
+
+    private static enum LoadState {
+        UNLOADED,
+        COCKING,
+    HALF_COCKED,
+    POWDER_LOADED
+    }
+
+    LoadState musketState;
 
 
     public MusketItem(Item.Settings settings) {
         super(settings);
+    }
+
+    @Override
+    public Predicate<ItemStack> getProjectiles() {
+        return MUSKET_PROJECTILES;
+    }
+
+    @Override
+    public int getRange() {
+        return 16;
     }
 
     //Sets weapon in use (firing/loading)
@@ -45,14 +61,13 @@ public class MusketItem extends Item{
         ItemStack weaponItemStack = user.getStackInHand(hand);
         if (isLoaded(weaponItemStack)) {
 
-            shoot(world, user, hand, weaponItemStack);
+            shoot(world, user, hand, weaponItemStack, user.isSneaking()? 0.5F : 3.0F);
             setLoaded(weaponItemStack, false);
             return TypedActionResult.consume(weaponItemStack);
         }
         if (!findAmmo(user).isEmpty()) {
             if (!isLoaded(weaponItemStack)) {
-                this.cocked = false;
-                this.loaded = false;
+               musketState = LoadState.UNLOADED;
                 user.setCurrentHand(hand);
             }
             return TypedActionResult.consume(weaponItemStack);
@@ -84,7 +99,7 @@ public class MusketItem extends Item{
             ammoStack = ItemStack.EMPTY;
         }
         if (ammoStack.isEmpty() && userCreative) {
-            ammoStack = new ItemStack(PitilessPillagers.MUSKET_BALL);
+            ammoStack = new ItemStack(ModItems.MUSKET_BALL);
         }
         return ammoStack;
     }
@@ -93,33 +108,42 @@ public class MusketItem extends Item{
         return stack.getItem() instanceof MusketBallItem;
     }
 
-    private static boolean checkAndConsumeAmmo(PlayerEntity player) {
+    private static boolean checkAndConsumeAmmo(LivingEntity user) {
 
-        boolean creative = player.isCreative();
+        boolean userIsPlayer = user instanceof  PlayerEntity;
 
-        ItemStack ammoStack = findAmmo(player);
+        if (userIsPlayer) {
 
-        if (ammoStack.isEmpty() && creative) {
-            ammoStack = new ItemStack(PitilessPillagers.MUSKET_BALL);
+            PlayerEntity playerUser = (PlayerEntity) user;
+            boolean userIsCreative = playerUser.isCreative();
+            ItemStack ammoStack = findAmmo(playerUser);
+
+            if (ammoStack.isEmpty() && userIsCreative) {
+                ammoStack = new ItemStack(ModItems.MUSKET_BALL);
+            }
+
+            return attemptConsumeAmmo(playerUser, ammoStack, userIsCreative);
         }
-
-        return attemptConsumeAmmo(player, ammoStack, creative);
+        else
+        {
+            return true;
+        }
     }
 
     private static boolean attemptConsumeAmmo(PlayerEntity player, ItemStack ammoStack, boolean creative)
     {
         if (creative) { return true; }
 
-            if (!ammoStack.isEmpty()) //If found ammo, consume 1 unit
-            {
-                ammoStack.decrement(1);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+        if (!ammoStack.isEmpty()) //If found ammo, consume 1 unit
+        {
+            ammoStack.decrement(1);
+            return true;
         }
+        else
+        {
+            return false;
+        }
+    }
 
 
     @Override
@@ -127,7 +151,7 @@ public class MusketItem extends Item{
         int timeLoading = this.getMaxUseTime(stack) - remainingUseTicks;
         float loadProgress = getLoadProgress(timeLoading, stack);
 
-        if (loadProgress >= 1.0f && !isLoaded(stack) && checkAndConsumeAmmo((PlayerEntity) user)) {
+        if (loadProgress >= 1.0f && !isLoaded(stack) && checkAndConsumeAmmo(user)) {
             setLoaded(stack, true);
             world.playSound(null, user.getX(), user.getY(), user.getZ(), ModSounds.MUSKET_COCK_FULL, SoundCategory.PLAYERS, 1.0f, 1.0f / (world.getRandom().nextFloat() * 0.5f + 1.0f) + 0.2f);
         }
@@ -142,70 +166,64 @@ public class MusketItem extends Item{
         return nbtCompound != null && nbtCompound.getBoolean(LOADED_KEY);
     }
 
-    public static void setLoaded(ItemStack stack, boolean charged) {
+    public static void setLoaded(ItemStack stack, boolean loaded) {
         NbtCompound nbtCompound = stack.getOrCreateNbt();
-        nbtCompound.putBoolean(LOADED_KEY, charged);
+        nbtCompound.putBoolean(LOADED_KEY, loaded);
     }
 
-    public static void shoot(World world, LivingEntity shooter, Hand hand, ItemStack weaponStack) {
-    boolean creative = ((PlayerEntity)shooter).isCreative();
-
-        if (!shooter.isWet())
-        {
-            Vec3d shooterLookVec3d = Vec3d.fromPolar(shooter.getPitch(), shooter.getYaw());
-            Vec3d firePosition = new Vec3d(shooter.getX(), shooter.getY() + shooter.getEyeHeight(shooter.getPose()), shooter.getZ());
-            for (int i = 0; i < 30; i++)
-            {
-                float velMagnModifier = 1.0F - 0.25F + shooter.getRandom().nextFloat() * 0.5F;
-
-                float particleVelX = (float)shooterLookVec3d.x * velMagnModifier + (-0.15F + shooter.getRandom().nextFloat() * 0.3F);
-                float particleVelY = (float)shooterLookVec3d.y * velMagnModifier + (-0.15F + shooter.getRandom().nextFloat() * 0.3F);
-                float particleVelZ = (float)shooterLookVec3d.z * velMagnModifier + (-0.15F + shooter.getRandom().nextFloat() * 0.3F);
+    public static void shoot(World world, LivingEntity shooter, Hand hand, ItemStack weaponStack, float divergence) {
 
 
-                world.addParticle(ParticleTypes.CLOUD, firePosition.x, firePosition.y, firePosition.z, particleVelX, particleVelY, particleVelZ);
-            }
-            if (!world.isClient())
-            {
-                //Create and spawn the bullet
-                MusketProjectileEntity bullet = new MusketProjectileEntity(world, shooter, 3.0D, false);
-                bullet.setVelocity(shooter, shooter.getPitch(), shooter.getYaw(), 6F, shooter.isSneaking()? 0.5F : 3.0F);
-                world.spawnEntity(bullet);
+        if (!shooter.isWet()) {
+            if (!world.isClient()) {
+                MusketProjectileEntity bullet = MusketItem.createBullet(world, shooter, weaponStack);
 
-                //Shot sound
-                world.playSound(null, shooter.getX(), shooter.getY(), shooter.getZ(), ModSounds.MUSKET_SHOT, SoundCategory.PLAYERS, 2.0F, 0.5F);
+                if (shooter instanceof MusketUser) {
+                    MusketUser musketUser = (MusketUser) shooter;
+                    musketUser.shoot(musketUser.getTarget(), weaponStack, bullet);
+                } else {
 
+                    boolean creative = ((PlayerEntity) shooter).isCreative();
 
-                //Degrade the durability
-                if (!creative)
-                {
-                    weaponStack.damage(1, shooter, (entity) -> {
-                        entity.sendToolBreakStatus(shooter.getActiveHand());
-                    });
+                    //Shot sound
+                    world.playSound(null, shooter.getX(), shooter.getY(), shooter.getZ(), ModSounds.MUSKET_SHOT, SoundCategory.PLAYERS, 2.0F, 0.5F);
+                    bullet.setVelocity(shooter, shooter.getPitch(), shooter.getYaw(), 6F, divergence);
 
-                    //additionally have a chance to explode if very low
-                    DamageSource gunexplosiondamage;
-                    int remainingLife = weaponStack.getMaxDamage() - weaponStack.getDamage();
-                    if (remainingLife <= 10)
-                    {
-                        if (shooter.getRandom().nextFloat() < (1.0F / (remainingLife + 1)))
-                        {
-                            ((PlayerEntity) shooter).getInventory().removeOne(weaponStack);
-                            gunexplosiondamage = new EntityDamageSource("gunexplosion", shooter);
-                            world.createExplosion(shooter, shooter.getX(), shooter.getY() + shooter.getEyeHeight(shooter.getPose()) - 0.1D, shooter.getZ(), 1.5F, false, Explosion.DestructionType.NONE);
-                            shooter.damage(gunexplosiondamage, 18.0F);
+                    //Degrade the durability
+                    if (!creative) {
+                        weaponStack.damage(1, shooter, (entity) -> {
+                            entity.sendToolBreakStatus(shooter.getActiveHand());
+                        });
 
+                        //additionally have a chance to explode if durability is very low
+                        DamageSource gunExplosionDamage;
+                        int remainingLife = weaponStack.getMaxDamage() - weaponStack.getDamage();
+                        if (remainingLife <= 10) {
+                            if (shooter.getRandom().nextFloat() < (1.0F / (remainingLife + 1))) {
+                                ((PlayerEntity) shooter).getInventory().removeOne(weaponStack);
+                                gunExplosionDamage = new EntityDamageSource("gunexplosion", shooter);
+                                world.createExplosion(shooter, shooter.getX(), shooter.getY() + shooter.getEyeHeight(shooter.getPose()) - 0.1D, shooter.getZ(), 1.5F, false, Explosion.DestructionType.NONE);
+                                shooter.damage(gunExplosionDamage, 18.0F);
+
+                            }
                         }
                     }
                 }
+                //Create and spawn the bullet
+                world.spawnEntity(bullet);
             }
 
-        }
-        else
-        {
+        } else {
             world.playSound(null, shooter.getX(), shooter.getY(), shooter.getZ(), ModSounds.MUSKET_MISFIRE, SoundCategory.PLAYERS, 2.0F, 1.0F);
-
         }
+
+    }
+
+
+    private static MusketProjectileEntity createBullet (World world, LivingEntity shooter, ItemStack weaponStack){
+        MusketProjectileEntity bullet = new MusketProjectileEntity(world, shooter, 2.0d, false);
+        bullet.setSound(ModSounds.BULLET_HIT);
+        return bullet;
     }
 
 
@@ -214,23 +232,26 @@ public class MusketItem extends Item{
         if (!world.isClient) {
             float f = (float)(stack.getMaxUseTime() - remainingUseTicks) / (float) MusketItem.getLoadTime(stack);
             if (f < 0.2f) {
-                this.cocked = false;
-                this.loaded = false;
+                this.musketState = LoadState.UNLOADED;
             }
-            if (f >= 0.2f && !this.cocked) {
-                this.cocked = true;
+            if (f >= 0.2f && this.musketState == LoadState.UNLOADED) {
+                this.musketState = LoadState.COCKING;
                 world.playSound(null, user.getX(), user.getY(), user.getZ(), ModSounds.MUSKET_COCK_START, SoundCategory.PLAYERS, 0.5f, 1.0f);
             }
-            if (f >= 0.5f && !this.loaded) {
-                this.loaded = true;
+            if (f >= 0.5f && this.musketState == LoadState.COCKING) {
                 world.playSound(null, user.getX(), user.getY(), user.getZ(), ModSounds.MUSKET_COCK_HALF, SoundCategory.PLAYERS, 0.5f, 1.0f);
+                this.musketState = LoadState.HALF_COCKED;
+            }
+            if (f >= 0.7f && this.musketState == LoadState.HALF_COCKED) {
+                world.playSound(null, user.getX(), user.getY(), user.getZ(), ModSounds.MUSKET_POWDER_POUR, SoundCategory.PLAYERS, 0.5f, 1.0f);
+                this.musketState = LoadState.POWDER_LOADED;
             }
         }
     }
 
     @Override
     public int getMaxUseTime(ItemStack stack) {
-        return MusketItem.getLoadTime(stack) + 3;
+        return MusketItem.getLoadTime(stack) + 5;
     }
 
     public static int getLoadTime(ItemStack stack) {
@@ -255,7 +276,7 @@ public class MusketItem extends Item{
         if (!MusketItem.isLoaded(stack)) {
             return;
         }
-        tooltip.add(new TranslatableText("item.pitilesspillagers.musket.loaded"));
+        tooltip.add(new TranslatableText("item.ModItems.musket.loaded"));
     }
 
     @Override

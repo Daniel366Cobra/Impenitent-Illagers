@@ -1,4 +1,4 @@
-package com.daniel366cobra.pitilesspillagers.entity;
+package com.daniel366cobra.pitilesspillagers.entity.mob;
 
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.goal.*;
@@ -17,6 +17,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.village.VillagerProfession;
@@ -90,7 +91,7 @@ public class KidnapperPillagerEntity extends IllagerEntity {
 
     @Override
     public SoundEvent getCelebratingSound() {
-        return null;
+        return SoundEvents.ENTITY_PILLAGER_CELEBRATE;
     }
 
     public BlockPos getRetreatBlockPos() {

@@ -15,6 +15,7 @@
   "sound.musket.misfire": "Осечка мушкета",
   "sound.musket.cock_start": "Мушкет взводится",
   "sound.musket.cock_half": "Мушкет на полувзводе",
+  "sound.musket.powder_pour": "Порох сыплется",
   "sound.musket.cock_full": "Мушкет взведен",
 
   "death.attack.bullet": "%1$s не ушел от пули %2$s.",

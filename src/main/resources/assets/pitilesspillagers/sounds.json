@@ -17,6 +17,15 @@
       }
     ]
   },
+  "musket_powder_pour": {
+    "subtitle": "sound.musket.powder_pour",
+    "sounds": [
+      {
+        "name": "pitilesspillagers:musket_powder_pour",
+        "stream": false
+      }
+    ]
+  },
   "musket_cock_full": {
     "subtitle": "sound.musket.cock_full",
     "sounds": [
