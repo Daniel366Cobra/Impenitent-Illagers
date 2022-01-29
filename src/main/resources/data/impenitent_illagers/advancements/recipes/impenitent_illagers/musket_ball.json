@@ -1,0 +1,29 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "impenitent_illagers:musket_ball"
+    ]
+  },
+  "criteria": {
+    "has_unlocked_musket": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "impenitent_illagers:flintlock_musket"
+      }
+
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "impenitent_illagers:musket_ball"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_unlocked_musket",
+      "has_the_recipe"
+    ]
+  ]
+}

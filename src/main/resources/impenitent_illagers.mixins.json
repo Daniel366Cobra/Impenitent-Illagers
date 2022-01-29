@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.daniel366cobra.impenitent_illagers.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "mixins": [
+    "RaidAddRaiderMixin"
+  ],
+  "client": [
+    "InGameHudMixin",
+    "PlayerEntityRendererGetArmPoseMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -115,7 +115,7 @@
 [19:12:54] [main/DEBUG] (FabricLoader/Entrypoint) Registering new-style initializer net.fabricmc.fabric.impl.client.container.ScreenProviderRegistryImpl::init for mod fabric-containers-v0 (key client)
 [19:12:54] [main/DEBUG] (FabricLoader/Entrypoint) Registering new-style initializer net.fabricmc.fabric.impl.networking.OldClientNetworkingHooks for mod fabric-networking-v0 (key client)
 [19:12:54] [main/DEBUG] (FabricLoader/Entrypoint) Registering new-style initializer net.fabricmc.fabric.impl.networking.OldNetworkingHooks for mod fabric-networking-v0 (key main)
-[19:12:54] [main/DEBUG] (FabricLoader/Entrypoint) Registering new-style initializer com.daniel366cobra.pitilesspillagers.PitilessPillagers for mod pitilesspillagers (key main)
+[19:12:54] [main/DEBUG] (FabricLoader/Entrypoint) Registering new-style initializer com.daniel366cobra.impenitent_illagers.ImpenitentIllagers for mod pitilesspillagers (key main)
 [19:12:54] [main/DEBUG] (FabricLoader/Entrypoint) Registering new-style initializer net.fabricmc.fabric.impl.networking.client.ClientNetworkingImpl::clientInit for mod fabric-networking-api-v1 (key client)
 [19:12:54] [main/DEBUG] (FabricLoader/Entrypoint) Registering new-style initializer net.fabricmc.fabric.impl.networking.NetworkingImpl::init for mod fabric-networking-api-v1 (key main)
 [19:12:54] [main/DEBUG] (FabricLoader/Entrypoint) Registering new-style initializer net.fabricmc.fabric.impl.structure.FabricStructureImpl for mod fabric-structure-api-v1 (key main)

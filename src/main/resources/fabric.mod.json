@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "pitilesspillagers",
+  "id": "impenitent_illagers",
   "version": "0.0.1",
 
-  "name": "Pitiless Pillagers",
+  "name": "Impenitent Illagers",
   "description": "They are coming",
   "authors": [
     "Daniel366Cobra"
@@ -14,19 +14,19 @@
   },
 
   "license": "CC0-1.0",
-  "icon": "assets/pitilesspillagers/icon.png",
+  "icon": "assets/impenitent_illagers/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.daniel366cobra.pitilesspillagers.PitilessPillagers"
+      "com.daniel366cobra.impenitent_illagers.ImpenitentIllagers"
     ],
     "client": [
-      "com.daniel366cobra.pitilesspillagers.client.PitilessPillagersClient"
+      "com.daniel366cobra.impenitent_illagers.client.ImpenitentIllagersClient"
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "impenitent_illagers.mixins.json"
   ],
 
   "depends": {

@@ -1,0 +1,139 @@
+{
+  "musket_cock_start": {
+    "subtitle": "sound.musket.cock_start",
+    "sounds": [
+      {
+        "name": "impenitent_illagers:musket_cock_start",
+        "stream": false
+      }
+    ]
+  },
+  "musket_cock_half": {
+    "subtitle": "sound.musket.cock_half",
+    "sounds": [
+      {
+        "name": "impenitent_illagers:musket_cock_half",
+        "stream": false
+      }
+    ]
+  },
+  "musket_powder_pour": {
+    "subtitle": "sound.musket.powder_pour",
+    "sounds": [
+      {
+        "name": "impenitent_illagers:musket_powder_pour",
+        "stream": false
+      }
+    ]
+  },
+  "musket_cock_full": {
+    "subtitle": "sound.musket.cock_full",
+    "sounds": [
+      {
+        "name": "impenitent_illagers:musket_cock_full",
+        "stream": false
+      }
+    ]
+  },
+  "musket_shot": {
+    "subtitle": "sound.musket.shot",
+    "sounds": [
+      {
+        "name": "impenitent_illagers:gunshot1",
+        "stream": false
+      },
+      {
+        "name": "impenitent_illagers:gunshot2",
+        "stream": false
+      },
+      {
+        "name": "impenitent_illagers:gunshot3",
+        "stream": false
+      },
+      {
+        "name": "impenitent_illagers:gunshot4",
+        "stream": false
+      }
+    ]
+  },
+  "musket_misfire": {
+    "subtitle": "sound.musket.misfire",
+    "sounds": [
+      {
+        "name": "impenitent_illagers:musket_misfire",
+        "stream": false
+      }
+    ]
+  },
+
+  "bullet_hit": {
+    "subtitle": "sound.bullet.hit",
+    "sounds": [
+      {
+        "name": "impenitent_illagers:bullet_hit",
+        "stream": false
+      }
+    ]
+  },
+  "bullet_ricochet": {
+    "subtitle": "sound.bullet.ricochet",
+    "sounds": [
+      {
+        "name": "impenitent_illagers:bullet_ricochet",
+        "stream": false
+      }
+    ]
+  },
+  "interloper_idle": {
+    "subtitle": "sound.interloper.idle",
+    "sounds": [
+      {
+        "name": "impenitent_illagers:interloper_idle1",
+        "stream": false
+      },
+      {
+        "name": "impenitent_illagers:interloper_idle2",
+        "stream": false
+      },
+      {
+        "name": "impenitent_illagers:interloper_idle3",
+        "stream": false
+      },
+      {
+        "name": "impenitent_illagers:interloper_idle4",
+        "stream": false
+      }
+    ]
+  },
+  "interloper_celebrate": {
+    "subtitle": "sound.interloper.celebrate",
+    "sounds": [
+      {
+        "name": "impenitent_illagers:interloper_celebrate",
+        "stream": false
+      }
+    ]
+  },
+  "interloper_hurt": {
+    "subtitle": "sound.interloper.hurt",
+    "sounds": [
+      {
+        "name": "impenitent_illagers:interloper_hurt1",
+        "stream": false
+      }
+    ]
+  },
+  "interloper_die": {
+    "subtitle": "sound.interloper.die",
+    "sounds": [
+      {
+        "name": "impenitent_illagers:interloper_die1",
+        "stream": false
+      },
+      {
+        "name": "impenitent_illagers:interloper_die2",
+        "stream": false
+      }
+    ]
+  }
+}

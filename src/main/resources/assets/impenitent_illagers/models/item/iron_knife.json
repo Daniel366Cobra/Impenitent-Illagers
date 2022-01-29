@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "impenitent_illagers:item/iron_knife"
+  }
+}

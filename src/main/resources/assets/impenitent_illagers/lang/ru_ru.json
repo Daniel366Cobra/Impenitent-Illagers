@@ -1,0 +1,50 @@
+{
+  "item.impenitent_illagers.iron_knife": "Железный нож",
+  "item.impenitent_illagers.flintlock_musket": "Кремнёвый мушкет",
+  "item.impenitent_illagers.musket.loaded": "Заряжено",
+  "item.impenitent_illagers.musket_ball": "Мушкетный патрон",
+  "item.impenitent_illagers.vexing_sigil": "Печать досаждателей",
+  "item.impenitent_illagers.vexing_sigil.tooltip_1": "Издает тихое, но несмолкающее хихиканье.",
+  "item.impenitent_illagers.vexing_sigil.tooltip_2": "Её магия хаотическая и озорная.",
+  "item.impenitent_illagers.evocation_fang": "Клык призыва",
+  "item.impenitent_illagers.evocation_fang.tooltip_1": "Острый как кинжал и тёплый на ощупь.",
+  "item.impenitent_illagers.evocation_fang.tooltip_2": "Он пульсирует от магии ненасытного голода.",
+  "item.impenitent_illagers.marauder_illager_spawn_egg": "Яйцо призыва мародёра",
+  "item.impenitent_illagers.arsonist_illager_spawn_egg": "Яйцо призыва поджигателя",
+  "item.impenitent_illagers.kidnapper_illager_spawn_egg": "Яйцо призыва похитителя",
+  "item.impenitent_illagers.interloper_illager_spawn_egg": "Яйцо призыва нарушителя",
+
+  "entity.impenitent_illagers.friendly_vex": "Дружелюбный досаждатель",
+  "entity.impenitent_illagers.marauder_illager": "Мародёр",
+  "entity.impenitent_illagers.arsonist_illager": "Поджигатель",
+  "entity.impenitent_illagers.kidnapper_illager": "Похититель",
+  "entity.impenitent_illagers.interloper_illager": "Нарушитель",
+
+  "sound.bullet.hit": "Попадание пули",
+  "sound.bullet.ricochet": "Рикошет пули",
+  "sound.musket.shot": "Выстрел мушкета",
+  "sound.musket.misfire": "Осечка мушкета",
+  "sound.musket.cock_start": "Мушкет взводится",
+  "sound.musket.cock_half": "Мушкет на полувзводе",
+  "sound.musket.powder_pour": "Порох сыплется",
+  "sound.musket.cock_full": "Мушкет взведен",
+
+  "sound.interloper.idle": "Нарушитель бормочет",
+  "sound.interloper.hurt": "Нарушитель ранен",
+  "sound.interloper.die": "Нарушитель погибает",
+  "sound.interloper.celebrate": "Нарушитель торжествует",
+
+  "death.attack.bullet": "%1$s не ушел от пули %2$s",
+  "death.attack.bullet.name": "%1$s застрелен %2$s из %3$s",
+  "death.attack.gunexplosion": "%1$s не следил за оружием",
+
+
+  "advancements.impenitent_illagers.root.title": "Безжалостные Разбойники",
+  "advancements.impenitent_illagers.root.description": "Ревет зловещий рог",
+  "advancements.impenitent_illagers.get_gunpowder.title": "Не только для фейерверков!",
+  "advancements.impenitent_illagers.get_gunpowder.description": "Раздобудьте немного пороха",
+  "advancements.impenitent_illagers.get_flintlock_musket.title": "Не намочи порох!",
+  "advancements.impenitent_illagers.get_flintlock_musket.description": "Изготовьте Кремневый мушкет"
+
+
+}

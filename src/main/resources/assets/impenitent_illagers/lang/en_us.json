@@ -1,0 +1,48 @@
+{
+  "item.impenitent_illagers.iron_knife": "Iron Knife",
+  "item.impenitent_illagers.musket_ball": "Musket Ball",
+  "item.impenitent_illagers.flintlock_musket": "Flintlock Musket",
+  "item.impenitent_illagers.musket.loaded": "Loaded",
+  "item.impenitent_illagers.vexing_sigil": "Sigil of Vexing",
+  "item.impenitent_illagers.vexing_sigil.tooltip_1": "It emits quiet but incessant cackling,",
+  "item.impenitent_illagers.vexing_sigil.tooltip_2": "and its magic feels shifty and mischievous.",
+  "item.impenitent_illagers.evocation_fang": "Fang of Evocation",
+  "item.impenitent_illagers.evocation_fang.tooltip_1": "It is pointy and warm to the touch,",
+  "item.impenitent_illagers.evocation_fang.tooltip_2": "and pulses with magic of insatiable hunger.",
+  "item.impenitent_illagers.marauder_illager_spawn_egg": "Marauder Spawn Egg",
+  "item.impenitent_illagers.arsonist_illager_spawn_egg": "Arsonist Spawn Egg",
+  "item.impenitent_illagers.kidnapper_illager_spawn_egg": "Kidnapper Spawn Egg",
+  "item.impenitent_illagers.interloper_illager_spawn_egg": "Interloper Spawn Egg",
+
+  "entity.impenitent_illagers.friendly_vex": "Friendly Vex",
+  "entity.impenitent_illagers.marauder_illager": "Marauder",
+  "entity.impenitent_illagers.arsonist_illager": "Arsonist",
+  "entity.impenitent_illagers.kidnapper_illager": "Kidnapper",
+  "entity.impenitent_illagers.interloper_illager": "Interloper",
+
+  "sound.bullet.hit": "Bullet hits",
+  "sound.bullet.ricochet": "Bullet ricochets",
+  "sound.musket.shot": "Musket shoots",
+  "sound.musket.misfire": "Musket misfires",
+  "sound.musket.cock_start": "Musket cocking",
+  "sound.musket.cock_half": "Musket half-cocked",
+  "sound.musket.powder_pour": "Powder pouring",
+  "sound.musket.cock_full": "Musket cocked and loaded",
+
+  "sound.interloper.idle": "Interloper grumbles",
+  "sound.interloper.hurt": "Interloper hurts",
+  "sound.interloper.die": "Interloper dies",
+  "sound.interloper.celebrate": "Interloper celebrates",
+
+  "death.attack.bullet": "%1$s was sniped by %2$s",
+  "death.attack.bullet.name": "%1$s was sniped by %2$s using %3$s",
+  "death.attack.gunexplosion": "%1$s's old musket got its revenge",
+
+  "advancements.impenitent_illagers.root.title": "Impenitent Illagers",
+  "advancements.impenitent_illagers.root.description": "Ominous Horn blares",
+  "advancements.impenitent_illagers.get_gunpowder.title": "Not just for fireworks",
+  "advancements.impenitent_illagers.get_gunpowder.description": "Obtain some gunpowder",
+  "advancements.impenitent_illagers.get_flintlock_musket.title": "Keep the powder dry",
+  "advancements.impenitent_illagers.get_flintlock_musket.description": "Make a Flintlock Musket"
+
+}

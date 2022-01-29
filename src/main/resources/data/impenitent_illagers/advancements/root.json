@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "item": "impenitent_illagers:flintlock_musket"
+    },
+    "title": {
+      "translate": "advancements.impenitent_illagers.root.title"
+    },
+    "description": {
+      "translate": "advancements.impenitent_illagers.root.description"
+    },
+    "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
+    "show_toast": false,
+    "announce_to_chat": false
+  },
+  "criteria": {
+    "crafting_table": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{
+          "item": "minecraft:crafting_table"
+        }]
+      }
+    }
+  }
+}

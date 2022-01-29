@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:gunpowder"
+    },
+    "title": {
+      "translate": "advancements.impenitent_illagers.get_gunpowder.title"
+    },
+    "description": {
+      "translate": "advancements.impenitent_illagers.get_gunpowder.description"
+    },
+    "frame": "task"
+  },
+  "parent": "impenitent_illagers:root",
+  "rewards": {
+    "experience": 50
+  },
+  "criteria": {
+    "has_powder": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{"items":["minecraft:gunpowder"]}]
+      }
+    }
+  }
+}

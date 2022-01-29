@@ -1,0 +1,26 @@
+{
+  "display": {
+    "icon": {
+      "item": "impenitent_illagers:flintlock_musket"
+    },
+    "title": {
+      "translate": "advancements.impenitent_illagers.get_flintlock_musket.title"
+    },
+    "description": {
+      "translate": "advancements.impenitent_illagers.get_flintlock_musket.description"
+    },
+    "frame": "task"
+  },
+  "parent": "impenitent_illagers:get_gunpowder",
+  "rewards": {
+    "experience": 50
+  },
+  "criteria": {
+    "has_musket": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [{"items":["impenitent_illagers:flintlock_musket"]}]
+      }
+    }
+  }
+}
