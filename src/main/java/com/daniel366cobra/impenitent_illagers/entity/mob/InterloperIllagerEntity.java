@@ -203,4 +203,10 @@ public class InterloperIllagerEntity extends IllagerEntity implements MusketUser
         }
         return false;
     }
+
+    @Nullable
+    @Override
+    public LivingEntity getTarget() {
+        return super.getTarget();
+    }
 }

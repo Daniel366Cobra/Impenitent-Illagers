@@ -1,6 +1,6 @@
 package com.daniel366cobra.impenitent_illagers.init;
 
-import com.daniel366cobra.impenitent_illagers.world.structures.PillagerFortFeature;
+import com.daniel366cobra.impenitent_illagers.world.gen.feature.PillagerFortFeature;
 import net.fabricmc.fabric.api.structure.v1.FabricStructureBuilder;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.gen.GenerationStep;

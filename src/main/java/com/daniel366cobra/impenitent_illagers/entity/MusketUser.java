@@ -17,7 +17,9 @@ public interface MusketUser
     void setLoading(boolean loading);
 
     void shoot(LivingEntity target, ItemStack musket, MusketProjectileEntity bullet);
+
     @Nullable LivingEntity getTarget();
+
     void postShoot();
 
     default void shoot(LivingEntity shooterEntity) {

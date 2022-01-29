@@ -35,8 +35,8 @@ public class MusketItem extends RangedWeaponItem{
     private enum LoadState {
         UNLOADED,
         COCKING,
-    HALF_COCKED,
-    POWDER_LOADED
+        HALF_COCKED,
+        POWDER_LOADED
     }
 
     LoadState musketState;
@@ -67,7 +67,7 @@ public class MusketItem extends RangedWeaponItem{
         }
         if (!findAmmo(user).isEmpty()) {
             if (!isLoaded(weaponItemStack)) {
-               musketState = LoadState.UNLOADED;
+                musketState = LoadState.UNLOADED;
                 user.setCurrentHand(hand);
             }
             return TypedActionResult.consume(weaponItemStack);
@@ -173,43 +173,46 @@ public class MusketItem extends RangedWeaponItem{
     }
 
     public static void shoot(World world, LivingEntity shooter, ItemStack weaponStack, float divergence) {
-
+        if (world.isClient())
+        {
+            return;
+        }
 
         if (!shooter.isWet()) {
-            if (!world.isClient()) {
-                MusketProjectileEntity bullet = MusketItem.createBullet(world, shooter);
 
-                if (shooter instanceof MusketUser musketUser) {
-                    musketUser.shoot(musketUser.getTarget(), weaponStack, bullet);
-                } else {
+            MusketProjectileEntity bullet = MusketItem.createBullet(world, shooter);
 
-                    boolean creative = ((PlayerEntity) shooter).isCreative();
+            if (shooter instanceof MusketUser musketUser) {
+                musketUser.shoot(musketUser.getTarget(), weaponStack, bullet);
+            } else {
 
-                    //Shot sound
-                    world.playSound(null, shooter.getX(), shooter.getY(), shooter.getZ(), ModSounds.MUSKET_SHOT, SoundCategory.PLAYERS, 2.0F, 0.5F);
-                    bullet.setVelocity(shooter, shooter.getPitch(), shooter.getYaw(), 6F, divergence);
+                boolean creative = ((PlayerEntity) shooter).isCreative();
 
-                    //Degrade the durability
-                    if (!creative) {
-                        weaponStack.damage(1, shooter, (entity) -> entity.sendToolBreakStatus(shooter.getActiveHand()));
+                //Shot sound
+                world.playSound(null, shooter.getX(), shooter.getY(), shooter.getZ(), ModSounds.MUSKET_SHOT, SoundCategory.PLAYERS, 2.0F, 0.5F);
+                bullet.setVelocity(shooter, shooter.getPitch(), shooter.getYaw(), 6F, divergence);
 
-                        //additionally have a chance to explode if durability is very low
-                        DamageSource gunExplosionDamage;
-                        int remainingLife = weaponStack.getMaxDamage() - weaponStack.getDamage();
-                        if (remainingLife <= 10) {
-                            if (shooter.getRandom().nextFloat() < (1.0F / (remainingLife + 1))) {
-                                ((PlayerEntity) shooter).getInventory().removeOne(weaponStack);
-                                gunExplosionDamage = new EntityDamageSource("gunexplosion", shooter);
-                                world.createExplosion(shooter, shooter.getX(), shooter.getY() + shooter.getEyeHeight(shooter.getPose()) - 0.1D, shooter.getZ(), 1.5F, false, Explosion.DestructionType.NONE);
-                                shooter.damage(gunExplosionDamage, 18.0F);
+                //Degrade the durability
+                if (!creative) {
+                    weaponStack.damage(1, shooter, (entity) -> entity.sendToolBreakStatus(shooter.getActiveHand()));
 
-                            }
+                    //additionally have a chance to explode if durability is very low
+                    DamageSource gunExplosionDamage;
+                    int remainingLife = weaponStack.getMaxDamage() - weaponStack.getDamage();
+                    if (remainingLife <= 10) {
+                        if (shooter.getRandom().nextFloat() < (1.0F / (remainingLife + 1))) {
+                            ((PlayerEntity) shooter).getInventory().removeOne(weaponStack);
+                            gunExplosionDamage = new EntityDamageSource("gunexplosion", shooter);
+                            world.createExplosion(shooter, shooter.getX(), shooter.getY() + shooter.getEyeHeight(shooter.getPose()) - 0.1D, shooter.getZ(), 1.5F, false, Explosion.DestructionType.NONE);
+                            shooter.damage(gunExplosionDamage, 18.0F);
+
                         }
                     }
                 }
-                //Create and spawn the bullet
-                world.spawnEntity(bullet);
             }
+            //Create and spawn the bullet
+            world.spawnEntity(bullet);
+
 
         } else {
             world.playSound(null, shooter.getX(), shooter.getY(), shooter.getZ(), ModSounds.MUSKET_MISFIRE, SoundCategory.PLAYERS, 2.0F, 1.0F);

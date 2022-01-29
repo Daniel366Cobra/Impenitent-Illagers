@@ -12,8 +12,4 @@ public class MusketBallItem extends Item {
         super(settings);
     }
 
-    public MusketProjectileEntity createMusketProjectile(World world, ItemStack ammo, LivingEntity shooter) {
-        return new MusketProjectileEntity(world, shooter, 2.0, false);
-    }
-
 }
