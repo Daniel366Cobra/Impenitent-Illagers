@@ -3,40 +3,28 @@ package com.daniel366cobra.impenitent_illagers.item;
 import com.daniel366cobra.impenitent_illagers.ImpenitentIllagers;
 import com.daniel366cobra.impenitent_illagers.entity.mob.FriendlyVexEntity;
 import com.daniel366cobra.impenitent_illagers.init.ModEntities;
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.mob.EvokerEntity;
 import net.minecraft.entity.mob.EvokerFangsEntity;
-import net.minecraft.entity.mob.VexEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.thrown.EggEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Random;
 
 public class SpellCastingItem extends Item {
 
     public enum Spell {
-    FANGS,
-    VEX
+        FANGS,
+        VEX
     }
 
     private Spell spell;
@@ -98,7 +86,7 @@ public class SpellCastingItem extends Item {
     }
 
     private void spawnFangsCircle(World world, PlayerEntity playerEntity) {
-        Vec3d fangSpawnVec3dPos = playerEntity.getPos();
+        Vec3d fangSpawnVec3dPos = playerEntity.getPos().add(0.0f, -0.01f, 0.0f);
         Vec3d userHorizontalRotationVec = Vec3d.fromPolar(0.0f, playerEntity.getHeadYaw());
 
         float angle = (float) Math.atan2(userHorizontalRotationVec.getZ(), userHorizontalRotationVec.getX());
@@ -117,48 +105,63 @@ public class SpellCastingItem extends Item {
     }
 
     private void spawnFangsLine(World world, PlayerEntity playerEntity) {
-
         Vec3d userHorizontalRotationVec = Vec3d.fromPolar(0.0f, playerEntity.getHeadYaw());
-        Vec3d fangSpawnVec3dPos = playerEntity.getPos();
+        Vec3d fangSpawnVec3dPos = playerEntity.getPos().add(0.0f, -0.01f, 0.0f);
 
-        for (int i = 0; i < 16; i++) {
-            fangSpawnVec3dPos = fangSpawnVec3dPos.add(userHorizontalRotationVec);
-            conjureFangs(world, playerEntity, fangSpawnVec3dPos, (float) Math.atan2(userHorizontalRotationVec.getZ(), userHorizontalRotationVec.getX()), i);
+        int i = 0;
+        float verticalStep = 0.0f;
+
+        ImpenitentIllagers.LOGGER.info(fangSpawnVec3dPos);
+        while (i < 16 && !Float.isNaN(verticalStep)) {
+            fangSpawnVec3dPos = fangSpawnVec3dPos.add(userHorizontalRotationVec).add(0.0f, verticalStep, 0.0f);
+            ImpenitentIllagers.LOGGER.info(fangSpawnVec3dPos);
+            verticalStep = conjureFangs(world, playerEntity, fangSpawnVec3dPos, (float) Math.atan2(userHorizontalRotationVec.getZ(), userHorizontalRotationVec.getX()), i);
+            i++;
         }
     }
 
-    private void conjureFangs(World world, PlayerEntity playerEntity, Vec3d positionVec3d, float yaw, int warmup) {
+    //returns a vertical step height or NaN if cannot conjure here
+    private float conjureFangs(World world, PlayerEntity playerEntity, Vec3d positionVec3d, float yaw, int warmup) {
 
+        //Fangs should spawn ON TOP of the block denoted by this BlockPos.
         BlockPos fangSpawnBlockPos = new BlockPos(positionVec3d);
 
-        //Fangs can go up/down 1 block at a time but not more. A solid block with air above it is required.
-        BlockPos fangSpawnOverlyingBlockPos = fangSpawnBlockPos.up();
-        BlockPos fangSpawnUnderlyingBlockPos = fangSpawnBlockPos.down();
+        Vec3d fangActualSpawnPositionVec3d;
 
-        float yStep = 0.0f;
-
-        if (!world.getBlockState(fangSpawnBlockPos).isAir()) {
-            if (!world.getBlockState(fangSpawnOverlyingBlockPos).isAir()) {
-                //at least 2 blocks high solid wall was encountered (current position + 1 above)
-                return;
+        if (!isCollisionShapeEmpty(world, fangSpawnBlockPos)) {
+            if (isCollisionShapeEmpty(world, fangSpawnBlockPos.up())) {
+                fangActualSpawnPositionVec3d = moveVec3dToUpperBoundingBoxSurface(world, fangSpawnBlockPos, positionVec3d);
+            } else if (isCollisionShapeEmpty(world, fangSpawnBlockPos.up().up())) {
+                fangActualSpawnPositionVec3d = moveVec3dToUpperBoundingBoxSurface(world, fangSpawnBlockPos.up(), positionVec3d);
             } else {
-                yStep = 1.0f;
+                return Float.NaN;
             }
-        } else if (world.getBlockState(fangSpawnUnderlyingBlockPos).isAir()) {
-            if (world.getBlockState(fangSpawnUnderlyingBlockPos.down()).isAir()) {
-                //at least 2 air blocks were encountered under current position
-                return;
+        } else {
+            if (!isCollisionShapeEmpty(world, fangSpawnBlockPos.down())) {
+                fangActualSpawnPositionVec3d = moveVec3dToUpperBoundingBoxSurface(world, fangSpawnBlockPos.down(), positionVec3d);
             } else {
-                yStep = -1.0f;
+                return Float.NaN;
             }
         }
 
-        positionVec3d = positionVec3d.add(0.0f, yStep, 0.0f);
-
         EvokerFangsEntity evokerFangsEntity = new EvokerFangsEntity(
-                world, positionVec3d.getX(), positionVec3d.getY(), positionVec3d.getZ(), yaw, warmup, playerEntity);
+                world, fangActualSpawnPositionVec3d.getX(), fangActualSpawnPositionVec3d.getY(), fangActualSpawnPositionVec3d.getZ(), yaw, warmup, playerEntity);
 
         world.spawnEntity(evokerFangsEntity);
+
+        float verticalStep = (float) (fangActualSpawnPositionVec3d.getY() - positionVec3d.getY());
+
+        ImpenitentIllagers.LOGGER.info(verticalStep);
+        return verticalStep;
+    }
+
+    private boolean isCollisionShapeEmpty(World world, BlockPos fangSpawnBlockPos) {
+        return world.getBlockState(fangSpawnBlockPos).getCollisionShape(world, fangSpawnBlockPos).isEmpty();
+    }
+
+    private static Vec3d moveVec3dToUpperBoundingBoxSurface(World world, BlockPos blockPos, Vec3d originalVec3d) {
+        float topSurfaceHeight = (float) world.getBlockState(blockPos).getCollisionShape(world, blockPos).getBoundingBox().getYLength();
+        return new Vec3d(originalVec3d.getX(), blockPos.getY() + topSurfaceHeight - 0.01f, originalVec3d.getZ());
     }
 
     private void summonVexes(World world, PlayerEntity playerEntity) {

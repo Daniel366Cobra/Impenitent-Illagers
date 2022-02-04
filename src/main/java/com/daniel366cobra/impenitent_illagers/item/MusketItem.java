@@ -29,18 +29,7 @@ import java.util.function.Predicate;
 public class MusketItem extends RangedWeaponItem{
     private static final String LOADED_KEY = "Loaded";
 
-
     public static final Predicate<ItemStack> MUSKET_PROJECTILES = stack -> stack.isOf(ModItems.MUSKET_BALL);
-
-    private enum LoadState {
-        UNLOADED,
-        COCKING,
-        HALF_COCKED,
-        POWDER_LOADED
-    }
-
-    LoadState musketState;
-
 
     public MusketItem(Item.Settings settings) {
         super(settings);
@@ -67,7 +56,6 @@ public class MusketItem extends RangedWeaponItem{
         }
         if (!findAmmo(user).isEmpty()) {
             if (!isLoaded(weaponItemStack)) {
-                musketState = LoadState.UNLOADED;
                 user.setCurrentHand(hand);
             }
             return TypedActionResult.consume(weaponItemStack);
@@ -78,7 +66,6 @@ public class MusketItem extends RangedWeaponItem{
     public static boolean hasAmmo(PlayerEntity user) {
         return findAmmo(user).isEmpty();
     }
-
 
     public static ItemStack findAmmo(PlayerEntity user) {
         boolean userCreative = user.isCreative();
@@ -110,19 +97,13 @@ public class MusketItem extends RangedWeaponItem{
     }
 
     private static boolean checkAndConsumeAmmo(LivingEntity user) {
-
-        boolean userIsPlayer = user instanceof  PlayerEntity;
-
-        if (userIsPlayer) {
-
-            PlayerEntity playerUser = (PlayerEntity) user;
-            boolean userIsCreative = playerUser.isCreative();
-            ItemStack ammoStack = findAmmo(playerUser);
+        if (user instanceof PlayerEntity playerEntity) {
+            boolean userIsCreative = playerEntity.isCreative();
+            ItemStack ammoStack = findAmmo(playerEntity);
 
             if (ammoStack.isEmpty() && userIsCreative) {
                 ammoStack = new ItemStack(ModItems.MUSKET_BALL);
             }
-
             return attemptConsumeAmmo(ammoStack, userIsCreative);
         }
         else
@@ -133,17 +114,12 @@ public class MusketItem extends RangedWeaponItem{
 
     private static boolean attemptConsumeAmmo(ItemStack ammoStack, boolean creative)
     {
-        if (creative) { return true; }
+        if (creative) return true;
 
-        if (!ammoStack.isEmpty()) //If found ammo, consume 1 unit
-        {
-            ammoStack.decrement(1);
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        if (ammoStack.isEmpty()) return false;
+
+        ammoStack.decrement(1);
+        return true;
     }
 
 
@@ -229,21 +205,19 @@ public class MusketItem extends RangedWeaponItem{
     @Override
     public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
         if (!world.isClient) {
-            float f = (float)(stack.getMaxUseTime() - remainingUseTicks) / (float) MusketItem.getLoadTime(stack);
-            if (f < 0.2f) {
-                this.musketState = LoadState.UNLOADED;
-            }
-            if (f >= 0.2f && this.musketState == LoadState.UNLOADED) {
-                this.musketState = LoadState.COCKING;
+            int totalLoadTicks = this.getMaxUseTime(stack);
+            int currentTick = totalLoadTicks - remainingUseTicks;
+
+            int cockedTick = (int) (totalLoadTicks * 0.2f);
+            int loadedTick = (int) (totalLoadTicks * 0.5f);
+            int powderLoadedTick = (int) (totalLoadTicks * 0.7f);
+
+            if (currentTick == cockedTick) {
                 world.playSound(null, user.getX(), user.getY(), user.getZ(), ModSounds.MUSKET_COCK_START, SoundCategory.PLAYERS, 0.5f, 1.0f);
-            }
-            if (f >= 0.5f && this.musketState == LoadState.COCKING) {
+            } else if (currentTick == loadedTick) {
                 world.playSound(null, user.getX(), user.getY(), user.getZ(), ModSounds.MUSKET_COCK_HALF, SoundCategory.PLAYERS, 0.5f, 1.0f);
-                this.musketState = LoadState.HALF_COCKED;
-            }
-            if (f >= 0.7f && this.musketState == LoadState.HALF_COCKED) {
+            } else if (currentTick == powderLoadedTick) {
                 world.playSound(null, user.getX(), user.getY(), user.getZ(), ModSounds.MUSKET_POWDER_POUR, SoundCategory.PLAYERS, 0.5f, 1.0f);
-                this.musketState = LoadState.POWDER_LOADED;
             }
         }
     }

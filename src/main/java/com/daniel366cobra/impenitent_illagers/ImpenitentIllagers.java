@@ -21,8 +21,6 @@ public class ImpenitentIllagers implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
 
-
-
 	@Override
 	public void onInitialize() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.

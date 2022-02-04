@@ -165,8 +165,6 @@ public class MusketProjectileEntity extends BaseProjectileEntity {
         this.setLife(0);
     }
 
-
-
     @Override
     public void updateTrackedPositionAndAngles(double x, double y, double z, float yaw, float pitch, int interpolationSteps, boolean interpolate) {
         this.setPosition(x, y, z);
