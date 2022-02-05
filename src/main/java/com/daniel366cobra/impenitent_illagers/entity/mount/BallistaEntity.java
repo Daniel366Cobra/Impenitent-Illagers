@@ -357,13 +357,13 @@ public class BallistaEntity extends Entity {
             if (this.clientInterpolationSteps > 0) {
                 double interpolatedX = this.getX() + (this.clientX - this.getX()) / (double)this.clientInterpolationSteps;
                 double interpolatedY = this.getY() + (this.clientY - this.getY()) / (double)this.clientInterpolationSteps;
-                double interpolatedYaw = this.getZ() + (this.clientZ - this.getZ()) / (double)this.clientInterpolationSteps;
+                double interpolatedZ = this.getZ() + (this.clientZ - this.getZ()) / (double)this.clientInterpolationSteps;
                 double deltaYaw = MathHelper.wrapDegrees(this.clientYaw - (double)this.getYaw());
                 double deltaPitch = MathHelper.wrapDegrees(this.clientPitch - (double)this.getPitch());
                 this.setYaw(this.getYaw() + (float)deltaYaw / (float)this.clientInterpolationSteps);
                 this.setPitch(this.getPitch() + (float)deltaPitch / (float)this.clientInterpolationSteps);
                 --this.clientInterpolationSteps;
-                this.setPosition(interpolatedX, interpolatedY, interpolatedYaw);
+                this.setPosition(interpolatedX, interpolatedY, interpolatedZ);
                 this.setRotation(this.getYaw(), this.getPitch());
             } else {
                 this.refreshPosition();
